@@ -10,4 +10,16 @@ From date: 2024.05.18
 
 > author: roseduan
 
+
+### Mini bitcask 
+
+> author: roseduan
+
+
+### MVCC
+
+> author: roseduan
+
+
+
 ## TODO
