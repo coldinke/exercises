@@ -3,8 +3,8 @@
 
 MODULE_LICENSE("GPL");
 
-#define ADD_ADDRESS 0x1010
-#define SUB_ADDRESS 0x1011
+#define ADD_ADDRESS 0xffffffffc0610000 
+#define SUB_ADDRESS 0xffffffffc0610010 
 
 typedef int (*FUNC_ADD) (int a, int b);
 typedef int (*FUNC_SUB) (int a, int b);
