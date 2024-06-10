@@ -61,16 +61,25 @@ mod tests {
         list.push(2);
         list.push(3);
 
+        // 3 -> 2 -> 1 -> Empty
+
         assert_eq!(list.pop(), Some(3));
         assert_eq!(list.pop(), Some(2));
 
+        //  1 -> Empty
+
         list.push(4);
         list.push(5);
+
+        // 5 -> 4 -> 1 -> Empty
 
         assert_eq!(list.pop(), Some(5));
         assert_eq!(list.pop(), Some(4));
 
         assert_eq!(list.pop(), Some(1));
+
+        // Empty 
+
         assert_eq!(list.pop(), None);
     }
 }
