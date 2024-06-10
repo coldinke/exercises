@@ -3,14 +3,17 @@
 
 MODULE_LICENSE("GPL");
 
+#define ADD_ADDRESS 0x1010
+#define SUB_ADDRESS 0x1011
+
 typedef int (*FUNC_ADD) (int a, int b);
 typedef int (*FUNC_SUB) (int a, int b);
 
 static int loader_init(void) {
     printk("loader-kernel init...\n");
 
-    FUNC_ADD add = (FUNC_ADD);
-    FUNC_SUB sub = (FUNC_SUB);
+    FUNC_ADD add = (FUNC_ADD)ADD_ADDRESS;
+    FUNC_SUB sub = (FUNC_SUB)SUB_ADDRESS;
 
     int result = 0;
     result = add(1, 2);
