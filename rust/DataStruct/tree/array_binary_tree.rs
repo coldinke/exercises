@@ -11,7 +11,7 @@ impl ArrayBinaryTree {
         self.tree.len() as i32
     }
 
-    fn val(&self, i : i32) -> Option<i32> {
+    fn val(&self, i: i32) -> Option<i32> {
         if i < 0 || i >= self.size() {
             None
         } else {
@@ -21,7 +21,7 @@ impl ArrayBinaryTree {
 
     fn left(&self, i: i32) -> i32 {
         2 * i + 1
-    } 
+    }
 
     fn right(&self, i: i32) -> i32 {
         2 * i + 2
@@ -41,7 +41,7 @@ impl ArrayBinaryTree {
         res
     }
 
-    fn dfs(&self, i :i32, order: &str, res: &mut Vec<i32>) {
+    fn dfs(&self, i: i32, order: &str, res: &mut Vec<i32>) {
         if self.val(i).is_none() {
             return;
         }
@@ -77,7 +77,6 @@ impl ArrayBinaryTree {
         res
     }
 }
-
 
 fn main() {
     let arr = vec![

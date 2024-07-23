@@ -1,7 +1,6 @@
-use std::vec;
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
-
+use std::vec;
 
 struct Trunk<'a, 'b> {
     prev: Option<&'a Trunk<'a, 'b>>,
@@ -55,10 +54,13 @@ pub fn print_tree(root: &Rc<RefCell<TreeNode>>) {
 fn _print_tree(root: Option<&Rc<RefCell<TreeNode>>>, prev: Option<&Trunk>, is_right: bool) {
     if let Some(node) = root {
         let mut prev_str = "    ";
-        let trunk = Trunk { prev, str: Cell::new(prev_str) };
+        let trunk = Trunk {
+            prev,
+            str: Cell::new(prev_str),
+        };
         _print_tree(node.borrow().right.as_ref(), Some(&trunk), true);
 
-        if  prev.is_none() {
+        if prev.is_none() {
             trunk.str.set("———");
         } else if is_right {
             trunk.str.set("/———");
@@ -92,7 +94,7 @@ pub fn print_heap(heap: Vec<i32>) {
     println!("堆的树状表示：");
     if let Some(root) = vec_to_tree(heap.into_iter().map(|val| Some(val)).collect()) {
         print_tree(&root);
-    } 
+    }
 }
 
 struct MaxHeap {
@@ -153,7 +155,7 @@ impl MaxHeap {
             self.swap(i, p);
             i = p;
         }
-    }    
+    }
 
     fn pop(&mut self) -> i32 {
         if self.is_empty() {
@@ -170,11 +172,11 @@ impl MaxHeap {
             let (l, r, mut greater) = (Self::left(i), Self::right(i), i);
             if l < self.size() && self.max_heap[l] > self.max_heap[greater] {
                 greater = l;
-            } 
+            }
             if r < self.size() && self.max_heap[r] > self.max_heap[greater] {
                 greater = r;
             }
-            if greater == i { 
+            if greater == i {
                 break;
             }
             self.swap(i, greater);

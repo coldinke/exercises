@@ -1,7 +1,6 @@
-use std::collections::BinaryHeap;
 use std::cell::{Cell, RefCell};
+use std::collections::BinaryHeap;
 use std::rc::Rc;
-
 
 struct Trunk<'a, 'b> {
     prev: Option<&'a Trunk<'a, 'b>>,
@@ -55,10 +54,13 @@ pub fn print_tree(root: &Rc<RefCell<TreeNode>>) {
 fn _print_tree(root: Option<&Rc<RefCell<TreeNode>>>, prev: Option<&Trunk>, is_right: bool) {
     if let Some(node) = root {
         let mut prev_str = "    ";
-        let trunk = Trunk { prev, str: Cell::new(prev_str) };
+        let trunk = Trunk {
+            prev,
+            str: Cell::new(prev_str),
+        };
         _print_tree(node.borrow().right.as_ref(), Some(&trunk), true);
 
-        if  prev.is_none() {
+        if prev.is_none() {
             trunk.str.set("———");
         } else if is_right {
             trunk.str.set("/———");
@@ -92,7 +94,7 @@ pub fn print_heap(heap: Vec<i32>) {
     println!("堆的树状表示：");
     if let Some(root) = vec_to_tree(heap.into_iter().map(|val| Some(val)).collect()) {
         print_tree(&root);
-    } 
+    }
 }
 
 fn test_push(heap: &mut BinaryHeap<i32>, val: i32, flag: i32) {

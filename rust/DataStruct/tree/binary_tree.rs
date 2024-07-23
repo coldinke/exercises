@@ -1,5 +1,5 @@
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 struct TreeNode {
     val: i32,
@@ -11,7 +11,7 @@ impl TreeNode {
         Rc::new(RefCell::new(Self {
             val,
             left: None,
-            right: None
+            right: None,
         }))
     }
 }
@@ -43,7 +43,7 @@ fn main() {
     let n3 = TreeNode::new(3);
     let n4 = TreeNode::new(4);
     let n5 = TreeNode::new(5);
-    
+
     // 这里的 Rc<RefCell<TreeNode>> 提供了内部可变性。
     // Rc 本身是不可变的，但 RefCell 允许我们在运行时借用起内部的可变引用。
     // clone 的操作来自 Rc 类型，而 Rc 是引用计数智能指针，

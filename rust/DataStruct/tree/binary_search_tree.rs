@@ -1,7 +1,7 @@
-use std::cell::RefCell;
 use std::cell::Cell;
-use std::rc::Rc;
+use std::cell::RefCell;
 use std::cmp::Ordering;
+use std::rc::Rc;
 
 #[derive(Debug)]
 struct TreeNode {
@@ -47,7 +47,7 @@ impl BianrySearchTree {
                 Ordering::Greater => cur = node.borrow().right.clone(),
                 Ordering::Less => cur = node.borrow().left.clone(),
             }
-        } 
+        }
         cur
     }
 
@@ -55,13 +55,13 @@ impl BianrySearchTree {
         if self.root.is_none() {
             self.root = Some(TreeNode::new(val));
         }
-        
+
         let mut cur = self.root.clone();
         let mut pre = None;
         while let Some(node) = cur.clone() {
             match val.cmp(&node.borrow().val) {
                 Ordering::Equal => return,
-                Ordering::Greater => { 
+                Ordering::Greater => {
                     pre = cur.clone();
                     cur = node.borrow().right.clone();
                 }
@@ -75,8 +75,8 @@ impl BianrySearchTree {
         let node = Some(TreeNode::new(val));
         if pre.borrow().val < val {
             pre.borrow_mut().right = node;
-        } else { 
-            pre.borrow_mut().left = node; 
+        } else {
+            pre.borrow_mut().left = node;
         }
     }
 
@@ -136,7 +136,6 @@ impl BianrySearchTree {
                 cur.borrow_mut().val = tmpval;
             }
         }
-
     }
 }
 
@@ -154,10 +153,13 @@ pub fn print_tree(root: &Rc<RefCell<TreeNode>>) {
 fn _print_tree(root: Option<&Rc<RefCell<TreeNode>>>, prev: Option<&Trunk>, is_right: bool) {
     if let Some(node) = root {
         let mut prev_str = "    ";
-        let trunk = Trunk { prev, str: Cell::new(prev_str) };
+        let trunk = Trunk {
+            prev,
+            str: Cell::new(prev_str),
+        };
         _print_tree(node.borrow().right.as_ref(), Some(&trunk), true);
 
-        if  prev.is_none() {
+        if prev.is_none() {
             trunk.str.set("———");
         } else if is_right {
             trunk.str.set("/———");
@@ -196,7 +198,6 @@ fn main() {
     println!("\n初始化的二叉树为\n");
     print_tree(bst.get_root().as_ref().unwrap());
 
-    
     /* 查找结点 */
     let node = bst.search(7);
     println!(

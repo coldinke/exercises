@@ -1,7 +1,7 @@
-use std::cell::RefCell;
 use std::cell::Cell;
-use std::rc::Rc;
+use std::cell::RefCell;
 use std::cmp::Ordering;
+use std::rc::Rc;
 
 #[derive(Debug)]
 struct TreeNode {
@@ -225,10 +225,13 @@ pub fn print_tree(root: &Rc<RefCell<TreeNode>>) {
 fn _print_tree(root: Option<&Rc<RefCell<TreeNode>>>, prev: Option<&Trunk>, is_right: bool) {
     if let Some(node) = root {
         let mut prev_str = "    ";
-        let trunk = Trunk { prev, str: Cell::new(prev_str) };
+        let trunk = Trunk {
+            prev,
+            str: Cell::new(prev_str),
+        };
         _print_tree(node.borrow().right.as_ref(), Some(&trunk), true);
 
-        if  prev.is_none() {
+        if prev.is_none() {
             trunk.str.set("———");
         } else if is_right {
             trunk.str.set("/———");
@@ -239,7 +242,7 @@ fn _print_tree(root: Option<&Rc<RefCell<TreeNode>>>, prev: Option<&Trunk>, is_ri
         }
 
         show_trunks(Some(&trunk));
-        println!(" {}", node.borrow().val);
+        println!(" {}, height {}", node.borrow().val, node.borrow().height);
         if let Some(prev) = prev {
             prev.str.set(prev_str);
         }
@@ -255,9 +258,6 @@ fn show_trunks(trunk: Option<&Trunk>) {
         print!("{}", trunk.str.get());
     }
 }
-
-
-
 
 fn main() {
     fn test_insert(tree: &mut AVLTree, val: i32) {
