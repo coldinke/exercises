@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet, VecDeque};
 
 #[derive(Copy, Clone, Hash, PartialEq, Eq)]
 pub struct Vertex {
@@ -37,7 +37,7 @@ impl GraphAdjList {
     }
 
     pub fn add_edge(&mut self, vet1: Vertex, vet2: Vertex) {
-        if !self.adj_list.contains_key(&vet1) || !self.adj_list.contains_key(&vet2) || vet1 == vet2 
+        if !self.adj_list.contains_key(&vet1) || !self.adj_list.contains_key(&vet2) || vet1 == vet2
         {
             panic!("value error");
         }
@@ -88,6 +88,29 @@ impl GraphAdjList {
     }
 }
 
+fn graph_bfs(graph: GraphAdjList, start_vet: Vertex) -> Vec<Vertex> {
+    let mut res = vec![];
+    let mut visited = HashSet::new();
+    visited.insert(start_vet);
+    let mut que = VecDeque::new();
+    que.push_back(start_vet);
+    while !que.is_empty() {
+        let vet = que.pop_front().unwrap();
+        res.push(vet);
+
+        if let Some(adj_vets) = graph.adj_list.get(&vet) {
+            for &adj_vet in adj_vets {
+                if visited.contains(&adj_vet) {
+                    continue;
+                }
+                que.push_back(adj_vet);
+                visited.insert(adj_vet);
+            }
+        }
+    }
+
+    res
+}
 
 fn main() {
     let v = vals_to_vets(vec![1, 3, 2, 5, 4]);
@@ -127,5 +150,8 @@ fn main() {
     graph.remove_vertex(v[1]);
     println!("\n删除顶点 3 后，图为");
     graph.print();
-}
 
+    let res = graph_bfs(graph, v[0]);
+    println!("\n广度优先遍历（BFS）顶点序列为");
+    println!("{:?}", vets_to_vals(res));
+}
