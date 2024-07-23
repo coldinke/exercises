@@ -13,6 +13,7 @@ pub fn vets_to_vals(vets: Vec<Vertex>) -> Vec<i32> {
     vets.into_iter().map(|vet| vet.val).collect()
 }
 
+#[derive(Clone)]
 pub struct GraphAdjList {
     pub adj_list: HashMap<Vertex, Vec<Vertex>>,
 }
@@ -112,6 +113,28 @@ fn graph_bfs(graph: GraphAdjList, start_vet: Vertex) -> Vec<Vertex> {
     res
 }
 
+fn dfs(graph: &GraphAdjList, visited: &mut HashSet<Vertex>, res: &mut Vec<Vertex>, vet: Vertex) {
+    res.push(vet);
+    visited.insert(vet);
+
+    if let Some(adj_vets) = graph.adj_list.get(&vet) {
+        for &adj_vet in adj_vets {
+            if visited.contains(&adj_vet) {
+                continue;
+            }
+            dfs(graph, visited, res, adj_vet);
+        }
+    }
+}
+
+fn graph_dfs(graph: GraphAdjList, start_vet: Vertex) -> Vec<Vertex> {
+    let mut res = vec![];
+    let mut visited = HashSet::new();
+    dfs(&graph, &mut visited, &mut res, start_vet);
+
+    res
+}
+
 fn main() {
     let v = vals_to_vets(vec![1, 3, 2, 5, 4]);
     let edges = vec![
@@ -133,6 +156,11 @@ fn main() {
     println!("\n添加边 1-2 后，图为");
     graph.print();
 
+    // BFS
+    let mut res = graph_bfs(graph.clone(), v[0].clone());
+    println!("\n广度优先遍历（BFS）顶点序列为");
+    println!("{:?}", vets_to_vals(res));
+
     /* 删除边 */
     // 顶点 1, 3 即 v[0], v[1]
     graph.remove_edge(v[0], v[1]);
@@ -151,7 +179,9 @@ fn main() {
     println!("\n删除顶点 3 后，图为");
     graph.print();
 
-    let res = graph_bfs(graph, v[0]);
-    println!("\n广度优先遍历（BFS）顶点序列为");
+
+    // DFS
+    res = graph_dfs(graph.clone(), v[0].clone());
+    println!("\n深度优先遍历（DFS）顶点序列为");
     println!("{:?}", vets_to_vals(res));
 }
