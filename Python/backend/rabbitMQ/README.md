@@ -1,6 +1,7 @@
 # RabbitMQ 3.13 
 
 Language: Python
+
 RabbitMQ libraries: pika
 
 ## Installing RabbitMQ
@@ -32,7 +33,9 @@ Overall design will look like:
 ### Code
 
 Send: [click](./part_1/sender.py)
+
 Receive: [click](./part_1/receive.py)
+
 
 ## Part II: Work Queues
 
@@ -48,6 +51,7 @@ Overall design will look like:
 
 ![Overall Desgin](./part_2/overallDesign.png)
 
+
 ### Dispatching 
 
 #### Round-robin dispatching
@@ -55,6 +59,7 @@ Overall design will look like:
 One of the advantages of using a Task Queue is the ability to easily **parallelise work**. If we are building up a backlog of work, we can just add more workers and that way, **scale easily**.
 
 By default, RabbitMQ will send each message to the next consumer, in sequence. On average every consumer will get the same number of messages. This way of distributing message called **round-robin**.
+
 
 #### Fair dispatch
 
@@ -116,6 +121,7 @@ channel.basic_consume(queue='hello', on_message_callback=callback)
 
 Acknowlefgement must be sent on the same channel that received the delivery. Attempts to acknowledge using a different channel will result in a channle-level protocol exception. See the [doc guide on confimations](https://www.rabbitmq.com/docs/confirms) to learn more.
 
+
 ### Message durability
 
 We have learned how to make sure that even if the consumer dies, the task isn't lost. But our tasks will **still be lost if RabbitMQ server stops**.
@@ -150,7 +156,89 @@ channel.basic_publish(exchange='',
 ### Code
 
 new_task: [click](./part_2/new_task.py)
+
 worker: [click](./part_2/worker.py)
+
+## Part III: Publish/Subscribe
+
+### Introduction
+
+In this part we'll do somethin completely different -- we'll deliver a message to **multiple consumers**. This pattern is known ad "publish/subscirbe"
+
+### Exchanges
+
+Let's quickly go over what we covered in the previous tutorials
+
+- A producer is a user application that sends messages.
+- A queue is a buffer that stores meessage.
+- A consumer is a user application that receives messages.
+
+The core idea in the **messaging model in RabbitMQ** is that the producer never sends any messages directly to a queue. Actually, quite often the producer doesn't even know if a message will be delivered to any queue at all.
+
+Instead, the producer can only send messages to an **exchange**. An exchange is a very simple thing. On ones side it receives messages from producers and on the other side it pushes them to queues. The exchange must know exactly what to do with a message it receives. 
+
+- Should it be appended to a particular queue
+- Should it be appended to many queues?
+- Should ti get discarded
+
+The rules for that are defined by teh exchange type.
+
+![Overall Design](./part_3/overallDesign.png)
+
+There are a few exchange types available: 
+
+- direct:
+- topic:
+- headers:
+- fanout: It just broadcasts all the messages it receives to all the queue it knows.
+
+### Teamporary queues
+
+Being able to name a queue was **crucial** for us - we need to point the workers to the same queue. Giving a queue a name is important when you want to **share** the queue between producers and consumers.
+
+But that's not the case of for our examples. We want to hear about all log messages, not just a **subset** of them. We're also interestead only in currently flowing messages not in the old ones. To solve that we need two things.
+
+Firstly, whenever we connect to Rabbit we need a **fresh**, **empty** queue. To do it we could create a queue with a random name, or, even better - let the server choose a random queue name for us. We can do this by **supplying empty** `queue` parameter to `queue_declare`
+
+Secondly, once the consumer connection is closed, the queue should be deleted. There's an `exclusive` flag for that
+
+`result = channel.queue_declare(queue='', exclusive=True)`
+
+You want to lean more about the `exclusive` flag and other queue properties in the `guide on queues`.
+
+### Bindings
+
+![Bindings](./part_3/Bindings.png)
+
+We've already created a fanout exchange and a queue. Now we need to tell the exchange to send messages to our queue. That **relationship** betweent exchange and a queue is called a binding.
+
+
+### Code
+
+emit_log: [click](./part_3/emit_log.py)
+
+receive_logs: [click](./part_3/receive_logs.py)
+
+## Part IV: Routing
+
+### Introduction
+
+### Code
+
+
+## Part V: Topics
+
+### Introduction
+
+### Code
+
+
+## Part VI: RPC
+
+### Introduction
+
+### Code
+
 
 
 ## References
