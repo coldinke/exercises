@@ -187,8 +187,8 @@ The rules for that are defined by teh exchange type.
 
 There are a few exchange types available: 
 
-- direct:
-- topic:
+- direct: A message goes to the queues whose `binding key` exactly matches the `routing key` of the message.
+- topic: When a queue is bound with `#`(hash) binding key - it will receive all the messages, regardless of the routing key - like in `fanout` exchange. When special characters `*`(star) and `#`(hash) aren't used in bindings, the **topic exchange will behave just like `direct` one**.
 - headers:
 - fanout: It just broadcasts all the messages it receives to all the queue it knows.
 
@@ -204,7 +204,7 @@ Secondly, once the consumer connection is closed, the queue should be deleted. T
 
 `result = channel.queue_declare(queue='', exclusive=True)`
 
-You want to lean more about the `exclusive` flag and other queue properties in the `guide on queues`.
+You want to lean more about the `exclusive` flag and other queue properties in the [guide on queues](https://www.rabbitmq.com/docs/queues).
 
 ### Bindings
 
@@ -212,6 +212,9 @@ You want to lean more about the `exclusive` flag and other queue properties in t
 
 We've already created a fanout exchange and a queue. Now we need to tell the exchange to send messages to our queue. That **relationship** betweent exchange and a queue is called a binding.
 
+### Direct exchange
+
+we will use a `direct` exchange instead. The routing algorithm behind a `direct` exchange is simple - a message goes to the queue whose `binding key` exactly matches the `routing key` of the message.
 
 ### Code
 
@@ -219,19 +222,80 @@ emit_log: [click](./part_3/emit_log.py)
 
 receive_logs: [click](./part_3/receive_logs.py)
 
+
 ## Part IV: Routing
 
 ### Introduction
 
+we're going to make it possible to subscribe only to a **subset** of the messages. For example, we will be able to direct only critical error messages to the log file, while still being able to print all of the log messages on the console.
+
+### Bindings
+
+**A binding is a relationship between an exchange and a queue**. This can be simply read as: the queue is **interested** in messages from this exchange.
+
+Bindings can take an extra `routing_key` parameter. To avoid the confusion with a `basic_publish` parameter we're going to call it a `binding_key`.
+
+To illustrate that, consider the following setup:
+
+![Overall Design](./part_4/overallDesign.png)
+
+In this setup, we can see the `direct` exchange `X` with two queues bound to it. The first queue is bound with binding key `orange`, and the second has two bindings, one with binding key `black` and the other one with `green`.
+
+In such a setup a message published to the exchange with routing key `orange` will be routed to queue `Q1`. Messages with a routing key of `black` or `green` will go to `Q2`. All other messages will **be dicarded**.
+
+### Multiple bindings
+
+**It is perfectly legal to bind multiple queue will the same binding key**. In our example we could add a binding between `X` and `Q1` with binding key `black`. In this case, the `direct` exchange will behave like `fanout` and will **broadcast** the message to **all the matching** queues. A message with routing key `black` will be delivered to both `Q1` and `Q2`.
+
+
 ### Code
 
+emit_log_direct: [click](./part_4/emit_log_direct.py)
+
+receive_logs_direct: [click](./part_4/receive_logs_direct.py)
 
 ## Part V: Topics
 
 ### Introduction
 
+In our logging system we might want to subscribe to not only logs based on severity. but also based on the **source** which emitted the log. You might know this concept from the `syslog` unix tool, which logs based on both severity (info/warn/crit...) and **facility**(auth/cron/kern...).
+
+That would give us a lot of flexibility - we may want to listen to just critical errors coming from 'cron' but also all logs from 'kern'.
+
+To implement that in our logging system we need to lean about more complex `topic` exchange.
+
+### Topic exchange
+
+Messages sent to a `topic` exchange can't have an arbitrary `routing_key` - it **must** be a list of words, delimited by dots. The words can be anything, but usually they specify some features connected to the message. A few valid routing key example: "`stock.usd.nyse`", "`nyse.vmw`", "`quick.orange.rabbit`". There can be as many words in the routing key as you like, up to the **limit of 255 bytes**.
+
+The binding key must also be in the same form. The logic behind the `topic` exchange is similar to a `direct` one - a message sent with a prticular routing key will be delivered to all the queues that are bound with a matching binding key. Howere there are two important special case for binding keys:
+
+- `*`(star) can substitute for exactly one word.
+- `#`(hash) can substitute for zero or more words.
+
+It's easiest to explain this in an example:
+
+![Overall Design](./part_5/overallDesign.png)
+
+In this example, we're going to send messages which all describe animals. The messages will be sent with a routing key that consists of **tree words**(two dots). The first word in the routing key will describe aa celerity, second a colour and third a species: 
+`<celerity>.<colour>.<species>`
+
+We created three bindings: Q1 is bound with binding key "`*.orange.*`" and Q2 with "`*.*.rabbit`" and "`lazy.#`"
+
+These bindings can be summarised as:
+- Q1 is interested in all the **orange** animals.
+- Q2 wants to hear everything about **rabbit**, and everything about **lazy** animals.
+
+What happens if we **break** out contract and send a message with one or four words. like `orange` or `quick.orange.new.rabbit`? Well, these messages won't match any bindings and will be lost.
+
+On the other hand `lazy.orange.new.rabbit`, even though it has four words, will match the last binding and will be delivered to the second queue.
+
+
 ### Code
 
+emit_log_topic: [click](./part_5/emit_log_topic.py)
+
+receive_logs_topic: [click](./part_5/receive_logs_topic.py)
 
 ## Part VI: RPC
 
@@ -243,4 +307,4 @@ receive_logs: [click](./part_3/receive_logs.py)
 
 ## References
 
-RabbitMQ 3.13 Documentation:https://www.rabbitmq.com/docs
+RabbitMQ tutorial: https://www.rabbitmq.com/docs
