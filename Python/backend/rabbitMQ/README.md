@@ -301,10 +301,64 @@ receive_logs_topic: [click](./part_5/receive_logs_topic.py)
 
 ### Introduction
 
+What if we need to run a function on a remote computer and wait for the result? Well, that's a different story. This pattern is commonly known as **Remote Procedure Call or RPC**.
+
+In this tutorial we're going to use RabbitMQ to build an RPC system: a client and a scalable RPC server. We're going to create a dummy RPC service that returns Fibonacci numbers.
+
+### Client interface
+
+To illustrate how an RPC service could be used we're going to create a simple client class. It's going to expose a method named `call` which sends an RPC request and **blocks** untill the answer is received.
+
+```Python
+fibonacci_rpc = FibonacciRpcClient()
+result = fibonacci_rpc.call(4)
+print(f"fib(4) is {result}")
+```
+
+### Callback queue
+
+In general doing RPC over RabbitMQ is easy. A client sends a request message and a server replies with a response message. In order to receive a response the client needs to send a 'callback' queue address with the request. Let's try it.
+
+```Python
+result = channel.queue_declare(queue='', exclusive=True)
+callback_queue = result.method.queue
+
+channel.basic_publish(exchange='',
+    routing_key='rpc_queue',
+    properties=pika.BasicProperties(
+        reply_to = callback_queue,
+    ),
+    body=request)
+```
+
+### Correlation id
+
+In the method presented above we suggest creating a callback queue for every RPC request. That's pretty inefficient, but fortunately there is a better way - let's create a single callback queue per client.
+
+That raise a new issue, having received a reponse in that queue it's not clear to which request the response belongs. That's when the `correlation_id` property is used. We're going to set it to a unique value for every request. Later, when we receive a message in the callback queue we'll look at this property, and based on that we'll be able to match a response with a request. If we see unkonwn `correlation_id` value. we may safely discard the message - it doesn't belong to our requests.
+
+why should we **ignore** unknown messages in the callback queue, rather than failing with an error? it's due to a possibility of a **race condition** on the server side. Although unlikely, it is possible that the RPC server will die just after sending us the answer, but before sending an acknowledgment message for the request. If that happens, the **restarted RPC server will process the request again**. That's why on the client we must handle the **duplicate response gracefully**, and the RPC should ideally be idempotent.
+
+### Summary
+
+![Summary](./part_6/Summary.png)
+
+Our RPC will work like this:
+
+- When the Client start up, it creates an **anonymous exclusive** callback queue.
+- For an RPC request, the Client sends a message with two properties: `reply_to`, which is set to the callback queue and `correlation_id`, which is set to a unique value for every request.
+- The request is sent to an `rpc_queue` queue.
+- The RPC worker(aka: server) is waiting for requests on that queue. When a request appears, it does the job and sends a message with the result back to the Client, using the queue from the `reply_to` field.
+- The client waits for data on the callback queue. When a message appears, it checks the `correlation_id` property. If it matches the value from the request it returns the response to the application.
+
+
 ### Code
 
+rpc_server: [click](./part_6/rpc_server.py)
 
+rpc_client: [click](./part_6/rpc_client.py)
 
 ## References
 
-RabbitMQ tutorial: https://www.rabbitmq.com/docs
+RabbitMQ tutorial: https://www.rabbitmq.com/tutorials/tutorial-one-python
+
