@@ -10,5 +10,7 @@
 .*
 
 
-# Python
+# Python and config
 /Python/venv
+database.ini
+
