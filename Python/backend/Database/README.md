@@ -134,9 +134,124 @@ PostgreSQL evaluates the clauses in the `SELECT` statement in the following orde
 
 ### SELECT DISTINCT
 
+The `SELECT DISTINCT` removes duplicate rows from a result set. The `SELECT DISTINCT` clause retains one row for each group of duplicates.
+
+The `SELECT DISTINCT` clause can be applied to one or more columns in the select list of the `SELECT` statement.
+
+The following illustrates the syntax of the `DISTINCT` clause:
+
+```sql
+SELECT 
+    DISTINCT column1
+FROM
+    table_name;
+```
+
+If you specify multiple columns, the `SELECT DISTINCT` clause will evaluate the duplicate based on the combination of values in these colunmns. For example:
+
+```sql
+SELECT
+    DISTINCT column1, column2
+FROM
+    table_name;
+```
 
 
 ## Part II: Filtering Data
+
+### WHERE 
+
+The `SELECT` statement returns all rows from one or more columns in a table. To retrieve rows that **satisfy** a specified condition, you use a `WHERE` clause.
+
+The syntax of the PostgreSQL, `WHERE` clause is as fllows:
+
+```sql
+SELECT
+    select_list
+FROM
+    table_name
+WHERE
+    condition
+ORDER BY
+    sort_expression;
+```
+
+In this syntax, you place the `WHERE` clause right after the `FROM` clause of the `SELECT` statement.
+
+The `WHERE` clause uses the `condition` to filter the rows returned from the `SELECT` clause. 
+
+The `condition` is a boolean expression that evaluates to true, false or unknown.
+
+The query returns only rows that satisfy the `condition` in the `WHERE` clause. In other words, the query will include only rows that cause the `condition` evaluates to **true** in the result set.
+
+PostgreSQL evaluates the `WHERE` clause after the `FROM` clause but before the `SELECT` and `ORDER BY` clause:
+
+![where progress](https://blog-pricture.obs.cn-east-3.myhuaweicloud.com/image/where_progress.png)
+
+Beside the `SELECT` statement, you can use the `WHERE` clause in the `UPDATE` and `DELETE` statement to specify rows to update and delete.
+
+
+### AND operator
+
+In postgreSQL, a boolean value can have one of three values: `true`, `false`, and `null`.
+
+PostgreSQL uses `true`, `'t'`, `'true'`, `'y'`, `'yes'`, `'1'` to represent `true` and `false`, `'f'`, `'false'`, `'n'`, `'no'`, and `'0'` to represent `false`.
+
+Here's the basic syntax of the `AND` operator:
+```sql
+expression1 AND expression2
+```
+
+In this syntax, `expression1` and `expression2` are boolean expressions that evaluate to `true`, `false`, or `null`.
+
+The following table shows the result of the `AND` operator when combining `true`, `false`, and `null`.
+
+| AND   | True  | False | Null  |
+|-------|-------|-------|-------|
+| True  | True  | False | Null  |
+| False | False | False | False |
+| Null  | Null  | False | Null  |
+
+
+### OR operator
+
+The `OR` operator is a logical operator that combines multiple boolean expressions. Here's the basic syntax  of the `OR` operator:
+
+```sql
+expression1 OR expression2
+```
+
+In this syntax, `expression1` and `expression2` are boolean expressions that evaluate to `true`, `false`, or `null`.
+
+The `OR` operator returns `true` only if any of the expressions is `true`. It returns `false` if both expressions are false. Otherwise, it returns null.
+
+The following talbe shows the result of the `OR` operator when combining `true`, `false` and `null`.
+
+
+|  OR   | True  | False | Null  |
+|-------|-------|-------|-------|
+| True  | True  | True  | True  |
+| False | True  | False | Null  |
+| Null  | True  | Null  | Null  |
+
+
+### LIMIT
+
+PostgreSQL `LIMIT` is an optional clause of the `SELECT` statement that constrains the number of rows returned by the query.
+
+Here's the basic syntax of the `LIMIT` clause:
+
+```sql
+SELECT
+    select_list
+FROM
+    table_name
+ORDER BY
+    sort_expression
+LIMIT
+    row_count;
+```
+
 
 
 ## Part III: Joining Multiple Tables
