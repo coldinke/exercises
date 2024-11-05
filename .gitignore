@@ -13,4 +13,6 @@
 # Python and config
 /Python/venv
 database.ini
+__pycache__/
+*.pyc
 
