@@ -398,7 +398,46 @@ The `NOT LIKE` operator returns `true` when the `value` does not match the `patt
 
 If the pattern does not contian any wildcard character, the `LIKE` operator behaves like the equal (`=`) operator.
 
+PostgreSQL `ILIKE` operator, which is similar to the `LIKE` operator, but allows for **case-insensitive matching**. 
+
+PostgreSQL also provides some operators that mirror the functionality of `LIKE`, `NOT LIKE`, `ILIKE`, `NOT ILIKE`, as shown in the follow table:
+| Operator | Equivalent |
+| -------- | ---------- |
+| ~~       | LIKE       |
+| ~~*      | ILIKE      |
+| !~~      | NOT LIKE   |
+| !~~*     | NOT ILIKE  |
+
+
+### IS NULL
+
+In the database world, NULL means missing information or not applicable. NULL is not a value, therefore, you cannot compare it with other values like numbers or strings.
+
+To comparison of NULL with a value will always result in NULL. Additionally, NULL is not equal to NULL so the following expression returns NULL.
+
+To check if a value is NULL or not, you can use the `IS NULL` operator.
+
+Here's the basic syntax of the `IS NULL` operator:
+
+```sql
+value IS NULL
+```
+
+The `IS NULL` operator returns true if the `value` is NULL or false otherwise.
+
+To negate the `IS NULL` operator, you use the `IS NOT NULL` operator.
+
+```sql
+value IS NOT NULL
+```
+
+The `IS NOT NULL` operator returns true if the value is not NULL or fase otherwise.
+
+
 ## Part III: Joining Multiple Tables
+
+PostgreSQL join is used to combine columns from one(self-join) or more tables based on the values of the common columns between related tables. The common columns are typically the primary key column of the first table and the foreign key column of the second table.
+
 
 
 ## Part IV: Grouping Data

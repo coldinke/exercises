@@ -51,5 +51,16 @@ Edit Date: 2024.07.26
 
 ### Backend Skill
 
-- MQ: RabbitMQ
-    * From the [documents](https://www.rabbitmq.com/docs)
+#### MQ (Message Queue) 
+
+##### RabbitMQ:
+
+From the [documents](https://www.rabbitmq.com/docs)
+My Notes [click](./Python/backend/rabbitMQ/README.md)
+
+#### Database
+
+##### PostgreSQL
+
+From the [documents](https://neon.tech/postgresql/tutorial)
+My Notes [click](./Python/backend/Database/README.md)
