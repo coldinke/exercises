@@ -1,6 +1,8 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func init() {
 	fmt.Println("This is first init function")
@@ -12,6 +14,9 @@ func init() {
 
 func main() {
 	fmt.Println("vim-go from main")
+
+	B()
+	A()
 }
 
 func init() {
