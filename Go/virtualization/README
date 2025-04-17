@@ -1,0 +1,17 @@
+# Virtualization
+
+## Overview
+
+## Chroot
+
+Change the root directory of the calling process to that specified in `path`. This directory will be used for pathnames begining with `/`. The root directory is inherited by all children of the calling process.
+
+More info: [click here](https://linux.die.net/man/2/chroot), or  use `man 2 chroot` in Linux.
+
+## Namespace
+
+A namespace wraps a global system resource in an abstraction that makes it appear to the processes within the namespace that they have their own isolated instance of the global resource. Changes to the global resource are visible to other processes that are members of the namespace, but are invisible to other processes.
+
+More info: [click here](https://man7.org/linux/man-pages/man7/namespaces.7.html), or use `man 7 namespaces` in Linux.
+
+## 

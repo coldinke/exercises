@@ -17,10 +17,10 @@ func getWd() (path string) {
 
 func main() {
 	RealRoot, err := os.Open("/")
-	defer RealRoot.Close()
 	if err != nil {
 		log.Fatalf("[ Error ] - /: %v\n", err)
 	}
+	defer RealRoot.Close()
 	path := getWd()
 	err = syscall.Chroot(path)
 	if err != nil {

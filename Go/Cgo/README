@@ -1,0 +1,9 @@
+# Cgo
+
+Cgo lets Go packages call C code. Given a Go source file written with some special features, cgo outputs Go and C files that can be combined into a single Go package.
+
+## More infomation
+
+(pkg.go.dev/cmd/cgo)[https://pkg.go.dev/cmd/cgo]
+(go.dev/blog/cgo)[https://go.dev/blog/cgo]
+(go.dev/wiki/cgo)[https://go.dev/wiki/cgo]

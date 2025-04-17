@@ -1,0 +1,75 @@
+# 额外的 Go Init 函数测试
+
+如果你想进行更深入的测试，可以考虑以下额外的测试场景：
+
+## 1. 循环依赖测试
+
+创建两个互相依赖的包，观察 Go 编译器如何处理：
+
+```
+pkg1 --> pkg2 --> pkg1 (循环依赖)
+```
+
+注意：Go 允许包之间的循环导入，但在导入链上的特定文件间不允许循环导入。
+
+## 2. init 函数中的变量访问测试
+
+测试 init 函数中访问包级变量的行为：
+
+```go
+package testpkg
+
+var PackageVar = "initial value"
+
+func init() {
+    // init 函数可以修改包级变量
+    PackageVar = "modified by init"
+}
+
+func init() {
+    // 后续的 init 函数可以看到修改后的值
+    if PackageVar != "modified by init" {
+        panic("unexpected value")
+    }
+}
+```
+
+## 3. 文件名排序测试
+
+在同一个包中创建多个文件，使用不同的文件名，验证 Go 是否按文件名的字典序执行 init：
+
+```
+pkg/
+  ├── a_file.go (包含 init 函数)
+  ├── b_file.go (包含 init 函数)
+  └── z_file.go (包含 init 函数)
+```
+
+## 4. 运行时导入测试
+
+使用 `plugin` 包测试运行时导入的包的 init 函数行为。
+
+## 5. 不同构建标记的 init 函数测试
+
+使用构建标记（build tags）测试条件编译下的 init 函数行为：
+
+```go
+// +build tag1
+
+package testpkg
+
+func init() {
+    // 只有在 go build -tags=tag1 时才会执行
+}
+```
+
+## 测试结果总结
+
+通过这些测试，我们可以得出以下结论：
+
+1. 同一个包中的 init 函数按照它们在源文件中出现的顺序执行
+2. 同一个包不同文件中的 init 函数按照文件名的字典序执行
+3. 包级变量在该包的任何 init 函数执行前初始化
+4. 导入链上的包按照依赖顺序初始化：被依赖的包先初始化
+5. 循环导入会导致编译错误或运行时错误，取决于循环依赖的性质
+6. init 函数不能被显式调用，只能在包初始化时自动调用
